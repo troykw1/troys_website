@@ -1,40 +1,13 @@
-// index.js
-const express = require('express');
-const bodyParser = require('body-parser');
-const client = require('./db');
+const express = require('express'); //Import the express dependency
+const app = express();              //Instantiate an express app, the main work horse of this server
+const port = 5000;                  //Save the port number where your server will be listening
 
-const app = express();
-const port = 5000;
-
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html'); // Serve the HTML form
+//Idiomatic expression in express to route and respond to a client request
+app.get('/', (req, res) => {        //get requests to the root ("/") will route here
+    res.sendFile('index.html', {root: __dirname});      //server responds by sending the index.html file to the client's browser
+                                                        //the .sendFile method needs the absolute path to the file, see: https://expressjs.com/en/4x/api.html#res.sendFile 
 });
 
-app.post('/submit', async (req, res) => {
-    const { name, email, message } = req.body;
-    try {
-        const result = await client.query(
-            'INSERT INTO contact (name, email, message) VALUES ($1, $2, $3)',
-            [name, email, message]
-        );
-        console.log("Data inserted successfully");
-        res.send('Thank you, we will be in contact with you shortly!');
-    } catch (err) {
-        console.error("Error inserting data", err);
-        res.status(500).send('Error saving data');
-    }
-});
-
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
-
-// Contact/index.js
-console.log("Executing code in Contact folder 2");
-
-module.exports = {
-  message: "Hello from Contact folder 2"
-};
+app.listen(port, () => {            //server starts listening for any attempts from a client to connect at port: {port}
+    console.log(`Now listening on port ${port}`);
+}); 
